@@ -88,7 +88,8 @@ Close and reopen PowerShell, then verify:
 duckdb -c "SELECT version();"
 ```
 
-![DuckDB version check](1.jpg)
+<img width="690" height="198" alt="2" src="https://github.com/user-attachments/assets/0fa5d040-da54-4941-a151-92109db21edd" />
+<img width="635" height="175" alt="1" src="https://github.com/user-attachments/assets/e3ea626c-bcc5-4322-8076-a552c71e6137" />
 
 ### Step 2 — Install the ADBC driver
 
@@ -191,7 +192,8 @@ LOAD snowflake;
 SELECT snowflake_version();
 ```
 
-![Install and verify the snowflake extension](2.jpg)
+<img width="690" height="198" alt="2" src="https://github.com/user-attachments/assets/5d6806c3-60a6-4863-847e-c74f7719c953" />
+
 
 `INSTALL` is one-time per DuckDB version; `LOAD` happens every session.
 
@@ -226,7 +228,8 @@ GROUP BY region
 ORDER BY total_ltv DESC;
 ```
 
-![Aggregate query against Snowflake from DuckDB](3.jpg)
+<img width="1059" height="305" alt="3" src="https://github.com/user-attachments/assets/84136274-9101-465f-a0cd-e594766cf788" />
+
 
 That aggregate ran on Snowflake's warehouse and returned 4 rows to DuckDB — not all 8 raw rows. Which brings us to…
 
@@ -237,7 +240,8 @@ EXPLAIN
 SELECT region, COUNT(*) FROM snowflake_db.greybeam_schema.my_table GROUP BY region;
 ```
 
-![Physical plan showing pushdown](4.jpg)
+<img width="1180" height="655" alt="4" src="https://github.com/user-attachments/assets/28fa3804-7aa7-41da-8ddd-4a2791b98e6e" />
+
 
 Read the plan bottom-up. The `SNOWFLAKE_TABLE_SCAN` at the bottom shows `Projections: REGION` — only the `region` column was pulled from Snowflake. Everything else (the COUNT, the GROUP BY) happens locally on a tiny slice of data. That's the cost-saving knob `enable_pushdown true` enables.
 
