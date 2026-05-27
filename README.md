@@ -264,8 +264,3 @@ Created locally, never committed: `sql/connect.sql`, `keys/`, `playground.duckdb
 
 ---
 
-## References
-
-- **Original article**: [Query Snowflake Directly from DuckDB](https://www.greybeam.ai/blog/querying-snowflake-with-duckdb) — GreyBeam, Kyle Cheung
-- **Extension**: [iqea-ai/duckdb-snowflake](https://github.com/iqea-ai/duckdb-snowflake)
-- **Snowflake key-pair auth**: [docs.snowflake.com/en/user-guide/key-pair-auth](https://docs.snowflake.com/en/user-guide/key-pair-auth)
