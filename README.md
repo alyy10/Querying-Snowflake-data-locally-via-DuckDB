@@ -24,32 +24,58 @@ This unlocks three things that used to take real Python plumbing:
 
 ## Architecture
 
-```mermaid
-flowchart LR
-    subgraph laptop["Your laptop (Windows)"]
-        you["You<br/>(DuckDB CLI)"]
-        engine["DuckDB engine"]
-        ext["snowflake<br/>extension"]
-        adbc["ADBC<br/>driver (DLL)"]
-        key[".p8 private<br/>key + passphrase"]
-    end
-
-    subgraph cloud["Snowflake cloud"]
-        verify["RSA public key<br/>on user"]
-        wh["Warehouse runs SQL"]
-        db[("Database<br/>+ tables")]
-    end
-
-    you -- "SQL" --> engine
-    engine -- "delegates" --> ext
-    ext -- "uses" --> adbc
-    key -- "signs auth challenge" --> adbc
-    adbc -- "TLS over internet" --> verify
-    verify -- "auth OK" --> wh
-    wh --> db
-    db -- "Apache Arrow rows" --> adbc
-    adbc -- "rows" --> engine
-    engine -- "results" --> you
+```
+┌─────────────────────────────────────────────────────────────────────┐
+│                      YOUR LAPTOP (Windows)                          │
+│                                                                     │
+│   ┌──────────────┐                                                  │
+│   │  You (CLI)   │                                                  │
+│   └──────┬───────┘                                                  │
+│          │ SQL                                                      │
+│          ▼                                                          │
+│   ┌──────────────┐                                                  │
+│   │ DuckDB engine│                                                  │
+│   └──────┬───────┘                                                  │
+│          │ delegates                                                │
+│          ▼                                                          │
+│   ┌─────────────────┐                                               │
+│   │   snowflake     │                                               │
+│   │   extension     │                                               │
+│   └─────────┬───────┘                                               │
+│             │ uses                                                  │
+│             ▼                                                       │
+│   ┌─────────────────┐  signs auth   ┌─────────────────────┐         │
+│   │ ADBC driver     │ ◀──────────── │  .p8 private key    │         │
+│   │    (DLL)        │  challenge    │   + passphrase      │         │
+│   └─────────┬───────┘               └─────────────────────┘         │
+│             │                                                       │
+└─────────────┼───────────────────────────────────────────────────────┘
+              │ TLS over internet
+              ▼
+┌─────────────────────────────────────────────────────────────────────┐
+│                       SNOWFLAKE CLOUD                               │
+│                                                                     │
+│   ┌──────────────────┐  verifies   ┌──────────────────────┐         │
+│   │  Auth handshake  │ ──────────▶ │   RSA public key     │         │
+│   │                  │             │   stored on user     │         │
+│   └─────────┬────────┘             └──────────────────────┘         │
+│             │ auth OK                                               │
+│             ▼                                                       │
+│   ┌──────────────────┐                                              │
+│   │ Warehouse runs   │                                              │
+│   │    your SQL      │                                              │
+│   └─────────┬────────┘                                              │
+│             │                                                       │
+│             ▼                                                       │
+│   ┌──────────────────┐                                              │
+│   │   Database +     │                                              │
+│   │     tables       │                                              │
+│   └─────────┬────────┘                                              │
+│             │ Apache Arrow rows                                     │
+└─────────────┼───────────────────────────────────────────────────────┘
+              │
+              ▼
+       Back through ADBC → extension → engine → results to you
 ```
 
 Four pieces have to physically exist for the chain to work:
