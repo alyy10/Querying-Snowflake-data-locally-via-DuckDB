@@ -1,0 +1,1 @@
+# Querying-Snowflake-data-locally-via-DuckDB
